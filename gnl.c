@@ -134,7 +134,7 @@ char		*get_next_line(const int fd)
 
   if (fd < 0)
     return (NULL);
-  else if (fd != -1 && fd != last_fd)
+  else if (last_fd != -1 && fd != last_fd)
     *hold = 0;
   last_fd = fd;
   if ((next_line = apply_strategy(hold, hold)))
