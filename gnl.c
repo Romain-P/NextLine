@@ -5,7 +5,7 @@
 ** Login   <romain.pillot@epitech.net>
 ** 
 ** Started on  Tue Nov 21 23:58:43 2017 romain pillot
-** Last update Wed Nov 22 01:13:45 2017 romain pillot
+** Last update Wed Nov 22 01:29:11 2017 romain pillot
 */
 
 #include <stdlib.h>
@@ -85,7 +85,7 @@ static void	split_newline(const char *result, char *split[2])
  * @param c	the char that will be searched into the string.
  * @return	true if the given string contains the given chararacter.
  **/
-bool		str_contains(const char *str, const char c)
+static bool	str_contains(const char *str, const char c)
 {
   while (str && *str)
     if (*str++ == c)
