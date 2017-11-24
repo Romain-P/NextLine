@@ -5,7 +5,7 @@
 ** Login   <romain.pillot@epitech.net>
 **
 ** Started on  Tue Nov 21 23:58:43 2017 romain pillot
-** Last update Fri Nov 24 19:25:05 2017 Romain
+** Last update Fri Nov 24 19:27:18 2017 Romain
 */
 
 #include <stdlib.h>
@@ -124,7 +124,7 @@ static char	*read_line(const int fd, char hold[])
       buffer[bytes] = 0;
       str = str_concat(str, buffer, true, false);
     }
-    if (str && *str && bytes == 0)
+  if (str && *str && bytes == 0)
     {
       *hold = 0;
       return (str);
