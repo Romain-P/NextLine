@@ -5,7 +5,7 @@
 ** Login   <romain.pillot@epitech.net>
 **
 ** Started on  Tue Nov 21 23:58:43 2017 romain pillot
-** Last update Fri Nov 24 19:16:32 2017 Romain
+** Last update Fri Nov 24 19:25:05 2017 Romain
 */
 
 #include <stdlib.h>
@@ -134,8 +134,10 @@ static char	*read_line(const int fd, char hold[])
 }
 
 /**
- * @param fd    the given file descriptor (>= 0).
+ * Get the next line of a given file descriptor kept in memory if present,
+ * read the next line with the given READ_SIZE otherwise.
  *
+ * @param fd    the given file descriptor (>= 0).
  * @return the next line read on a given file descriptor.
  **/
 char		*get_next_line(const int fd)
