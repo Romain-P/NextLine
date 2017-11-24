@@ -1,11 +1,11 @@
 /*
 ** gnl.c for  in /home/romain.pillot/gnl
-** 
+**
 ** Made by romain pillot
 ** Login   <romain.pillot@epitech.net>
-** 
+**
 ** Started on  Tue Nov 21 23:58:43 2017 romain pillot
-** Last update Wed Nov 22 01:29:11 2017 romain pillot
+** Last update Fri Nov 24 19:16:32 2017 Romain
 */
 
 #include <stdlib.h>
@@ -22,7 +22,7 @@
  **/
 static char	*str_concat(char *a, char *b, bool free_a, bool free_b)
 {
-  char		*new = NULL;
+  char		*new_str = NULL;
   size_t	a_len = 0;
   size_t	b_len = 0;
   size_t	new_len;
@@ -32,18 +32,18 @@ static char	*str_concat(char *a, char *b, bool free_a, bool free_b)
   while (b && b[b_len])
     ++b_len;
   new_len = a_len + b_len;
-  if (!(new = malloc(sizeof(char) * (new_len + 1))))
+  if (!(new_str = malloc(sizeof(char) * (new_len + 1))))
     return (NULL);
-  new[new_len] = 0;
-  while (b_len > 0)
-    new[--new_len] = b[--b_len];
-  while (a_len > 0)
-    new[--new_len] = a[--a_len];
+  new_str[new_len] = 0;
+  while (b && b_len > 0)
+    new_str[--new_len] = b[--b_len];
+  while (a && a_len > 0)
+    new_str[--new_len] = a[--a_len];
   if (free_a && a)
     free(a);
   if (free_b && b)
     free(b);
-  return (new);
+  return (new_str);
 }
 
 /**
@@ -60,11 +60,9 @@ static void	split_newline(const char *result, char *split[2])
   size_t	rest_length = 0;
   uint32_t	index = -1;
 
-  split[0] = NULL;
-  split[1] = NULL;
   while (result && result[line_length] && result[line_length] != '\n')
     ++line_length;
-  if (line_length == 0 || !(split[0] = malloc(sizeof(char) * (line_length + 1))))
+  if (!result[line_length] || line_length == 0 || !(split[0] = malloc(sizeof(char) * (line_length + 1))))
     return;
   split[0][line_length] = 0;
   while (++index < line_length)
@@ -81,19 +79,6 @@ static void	split_newline(const char *result, char *split[2])
 }
 
 /**
- * @param str	the string which gonna be analized.
- * @param c	the char that will be searched into the string.
- * @return	true if the given string contains the given chararacter.
- **/
-static bool	str_contains(const char *str, const char c)
-{
-  while (str && *str)
-    if (*str++ == c)
-      return (true);
-  return (false);
-}
-
-/**
  * This function's looking for a new line.
  * If there is a new line, it's returned and the rest is put into the hold var.
  *
@@ -103,11 +88,9 @@ static bool	str_contains(const char *str, const char c)
  **/
 static char	*apply_strategy(const char *str, char hold[])
 {
-  char		*split[2];
+  char		*split[2] = {0};
   uint32_t	index = -1;
 
-  if (!str_contains(str, '\n'))
-    return (NULL);
   split_newline(str, split);
   if (split[1] != NULL) {
     while (split[1][++index])
@@ -117,7 +100,39 @@ static char	*apply_strategy(const char *str, char hold[])
   }
   return (split[0]);
 }
-  
+
+/**
+ * Reads the next line on the given file descriptor, then concatenate it
+ * with the characters kept in the hold buffer, then save again the characters
+ * after the new line in the given hold buffer.
+ *
+ * @param hold	a buffer that may stock found characters after the new line.
+ * @return	the next line read on the given file descriptor.
+ */
+static char	*read_line(const int fd, char hold[])
+{
+  char		*str = NULL;
+  char		*next_line;
+  char		buffer[READ_SIZE + 1];
+  size_t	bytes;
+
+  str = str_concat(hold, str, false, false);
+  while (!(next_line = apply_strategy(str, hold)))
+    {
+      if ((bytes = read(fd, buffer, READ_SIZE)) <= 0)
+	break;
+      buffer[bytes] = 0;
+      str = str_concat(str, buffer, true, false);
+    }
+    if (str && *str && bytes == 0)
+    {
+      *hold = 0;
+      return (str);
+    }
+  free(str);
+  return (next_line);
+}
+
 /**
  * @param fd    the given file descriptor (>= 0).
  *
@@ -127,29 +142,13 @@ char		*get_next_line(const int fd)
 {
   static char	hold[READ_SIZE + 1] = {0};
   static int	last_fd = -1;
-  char		buffer[READ_SIZE + 1];
-  size_t	bytes;
-  char		*str = NULL;
-  char		*next_line;
+  char		*hold_str;
 
   if (fd < 0)
     return (NULL);
   else if (last_fd != -1 && fd != last_fd)
     *hold = 0;
   last_fd = fd;
-  if ((next_line = apply_strategy(hold, hold)))
-    return (next_line);
-  str = str_concat(hold, str, false, false);
-  while (!(next_line = apply_strategy(str, hold))) {
-    if ((bytes = read(fd, buffer, READ_SIZE)) <= 0)
-      break;
-    buffer[bytes] = 0;
-    str = str_concat(str, buffer, true, false);
-  }
-  if (str && *str && bytes == 0) {
-    *hold = 0;
-    return (str);
-  }
-  free(str);
-  return (next_line);
+  hold_str = apply_strategy(hold, hold);
+  return (hold_str ? hold_str : read_line(fd, hold));
 }

@@ -1,11 +1,11 @@
 /*
 ** gnl.h for  in /home/romain.pillot/gnl
-** 
+**
 ** Made by romain pillot
 ** Login   <romain.pillot@epitech.net>
-** 
+**
 ** Started on  Wed Nov 22 00:00:26 2017 romain pillot
-** Last update Wed Nov 22 00:51:43 2017 romain pillot
+** Last update Fri Nov 24 19:17:29 2017 Romain
 */
 
 #ifndef GNL_H_
